@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite App</title>
+  </head>
+  <body>
+    <!-- منوی بازی -->
+    <div id="game-menu" class="game-menu">
+      <div class="game-menu-overlay"></div>
+      <div class="game-menu-content">
+        <div class="game-menu-header">
+          <h1 class="game-menu-title">
+            <span class="game-menu-icon">🎮</span>
+            <span>Select Game</span>
+          </h1>
+        </div>
+        <div class="game-cards" id="game-cards">
+          <!-- Games will be added dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- صفحه بازی (مخفی در ابتدا) -->
+    <div id="game-screen" class="game-screen" style="display: none;">
+      <!-- دکمه باز کردن مدال تم -->
+      <button id="theme-button" class="theme-open-button">🎨</button>
+      
+      <!-- مدال تم -->
+    <div id="theme-modal" class="theme-modal">
+      <div class="theme-modal-overlay"></div>
+      <div class="theme-modal-content">
+        <div class="theme-modal-header">
+          <h2 class="theme-modal-title">
+            <span class="theme-icon">🎨</span>
+            <span>Select Theme</span>
+          </h2>
+          <button class="theme-modal-close" id="theme-modal-close">✕</button>
+        </div>
+        <div class="theme-buttons" id="theme-buttons">
+          <!-- Themes will be added dynamically -->
+        </div>
+      </div>
+    </div>
+    
+    <canvas class="game"></canvas>
+    <div id="controls">
+      <div>
+        <button id="forward">▲</button>
+        <button id="left">◀</button>
+        <button id="backward">▼</button>
+        <button id="right">▶</button>
+      </div>
+    </div>
+    <div id="score">0</div>
+      <div id="result-container">
+        <div id="result">
+          <h1>Game Over</h1>
+          <p>Your score: <span id="final-score"></span></p>
+          <button id="retry">Retry</button>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
