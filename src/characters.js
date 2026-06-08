@@ -97,6 +97,20 @@ export const characters = {
     },
     style: "boxy",
   },
+  ali: {
+    id: "ali",
+    name: "علی",
+    icon: "🧔",
+    description: "علی",
+    texture: "/characters/ali-head.png",
+    cubeSize: [24, 24, 28],
+    colors: {
+      body: 0xffffff,
+      cap: 0xffffff,
+      eyes: 0x000000,
+    },
+    style: "textured",
+  },
 };
 
 export const defaultCharacter = "default";

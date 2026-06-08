@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
-import { queueMove } from '../components/Player';
+import { useRoadCrossingControls } from '../road-crossing/GameContext';
 
 export function useGameControls() {
+  const { queueMove } = useRoadCrossingControls();
+
   useEffect(() => {
-    // اضافه کردن رویداد کلیک برای دکمه‌ها
     const forwardBtn = document.getElementById('forward');
     const backwardBtn = document.getElementById('backward');
     const leftBtn = document.getElementById('left');
@@ -19,8 +20,9 @@ export function useGameControls() {
     leftBtn?.addEventListener('click', handleLeft);
     rightBtn?.addEventListener('click', handleRight);
 
-    // اضافه کردن رویداد کیبورد
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.repeat) return;
+
       if (event.key === 'ArrowUp') {
         event.preventDefault();
         queueMove('forward');
@@ -38,7 +40,6 @@ export function useGameControls() {
 
     window.addEventListener('keydown', handleKeyDown);
 
-    // Cleanup
     return () => {
       forwardBtn?.removeEventListener('click', handleForward);
       backwardBtn?.removeEventListener('click', handleBackward);
@@ -46,6 +47,5 @@ export function useGameControls() {
       rightBtn?.removeEventListener('click', handleRight);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [queueMove]);
 }
-
