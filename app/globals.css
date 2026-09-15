@@ -1,3 +1,14 @@
+@font-face {
+  font-family: "Ferro Rosso";
+  src:
+    url("/fonts/FerroRosso.woff2") format("woff2"),
+    url("/fonts/FerroRosso.woff") format("woff"),
+    url("/fonts/FerroRosso.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -14,7 +25,8 @@ html, body {
 
 body {
   display: flex;
-  font-family: "Comic Sans MS", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Ferro Rosso", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  letter-spacing: 0.04em;
 }
 
 /* منوی بازی */
@@ -38,6 +50,7 @@ body {
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.3);
+  pointer-events: none;
 }
 
 .game-menu-content {
@@ -59,6 +72,7 @@ body {
   align-items: center;
   gap: 15px;
   font-size: 48px;
+  font-weight: normal;
   color: white;
   text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
   margin: 0;
@@ -68,6 +82,8 @@ body {
   border: 4px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .game-menu-icon {
@@ -120,6 +136,7 @@ body {
   height: 100%;
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
   transition: left 0.5s;
+  pointer-events: none;
 }
 
 .game-card:hover::before {
@@ -234,6 +251,7 @@ canvas.game {
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
   animation: fadeIn 0.3s ease;
+  z-index: 0;
 }
 
 @keyframes fadeIn {
@@ -258,7 +276,7 @@ canvas.game {
   max-height: 90vh;
   overflow-y: auto;
   animation: slideUp 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  z-index: 2001;
+  z-index: 1;
 }
 
 @keyframes slideUp {
@@ -351,6 +369,7 @@ canvas.game {
   background: rgba(255, 255, 255, 0.5);
   transform: translate(-50%, -50%);
   transition: width 0.6s, height 0.6s;
+  pointer-events: none;
 }
 
 .theme-button:hover::before {
@@ -488,77 +507,479 @@ canvas.game {
   filter: brightness(1.08);
 }
 
-#controls {
+.rc-game-shell {
+  touch-action: none;
+  overscroll-behavior: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.rc-back-btn {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  left: max(12px, env(safe-area-inset-left));
+  z-index: 1002;
+  padding: 10px 16px;
+  background-color: #667eea;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.rc-hud-btn {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  z-index: 1001;
+}
+
+.rc-hud-theme {
+  right: max(72px, calc(env(safe-area-inset-right) + 60px));
+}
+
+.rc-hud-character {
+  right: max(12px, env(safe-area-inset-right));
+}
+
+.rc-controls {
   position: absolute;
-  bottom: 20px;
-  min-width: 100%;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  min-width: 0;
   display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 1100;
+  pointer-events: none;
+}
+
+.rc-controls-p1 {
+  right: max(16px, env(safe-area-inset-right));
+  left: auto;
   align-items: flex-end;
-  justify-content: center;
+}
+
+.rc-controls-p2 {
+  left: max(16px, env(safe-area-inset-left));
+  right: auto;
+  align-items: flex-start;
+}
+
+.rc-controls-label {
+  pointer-events: none;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.35);
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+.rc-mode-toggle {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1002;
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.rc-mode-toggle button {
+  border: none;
+  background: transparent;
+  padding: 8px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  color: #2d3748;
+}
+
+.rc-mode-toggle button.active {
+  background: #667eea;
+  color: #fff;
+}
+
+.rc-mode-toggle .rc-mode-soon {
+  opacity: 0.55;
+}
+
+.rc-chain-hint {
+  position: absolute;
+  top: max(64px, calc(env(safe-area-inset-top) + 52px));
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 1000;
+  max-width: min(520px, 92vw);
+  text-align: center;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: #1a202c;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 6px 12px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
 }
 
-#controls div {
-  display: grid;
-  grid-template-columns: 50px 50px 50px;
-  gap: 10px;
+.rc-zoom-controls {
+  position: absolute;
+  top: max(70px, calc(env(safe-area-inset-top) + 58px));
+  right: max(12px, env(safe-area-inset-right));
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: auto;
 }
 
-#controls button {
-  width: 100%;
+.rc-zoom-btn {
+  width: 40px;
   height: 40px;
-  background-color: white;
-  border: 1px solid lightgray;
-  box-shadow: 3px 5px 0px 0px rgba(0, 0, 0, 0.75);
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  color: #2d3748;
+}
+
+.rc-zoom-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.rc-zoom-value {
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: #1a202c;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 2px 6px;
+  border-radius: 6px;
+  min-width: 40px;
+  text-align: center;
+}
+
+.rc-controls-pad {
+  display: grid;
+  grid-template-columns: 52px 52px 52px;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.rc-pad-btn {
+  width: 52px;
+  height: 52px;
+  min-width: 44px;
+  min-height: 44px;
+  background-color: rgba(255, 255, 255, 0.92);
+  border: 1px solid #c5c5c5;
+  border-radius: 12px;
+  box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.55);
   cursor: pointer;
   outline: none;
+  font-size: 18px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-#controls button:first-of-type {
-  grid-column: 1/-1;
+.rc-pad-btn:active {
+  transform: translate(1px, 2px);
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.55);
 }
 
-#score {
+.rc-pad-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.rc-pad-forward {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: 64px;
+}
+
+.rc-score {
   position: absolute;
-  top: 70px;
-  left: 20px;
-  font-size: 2em;
+  top: max(64px, calc(env(safe-area-inset-top) + 52px));
+  left: max(12px, env(safe-area-inset-left));
+  font-size: clamp(1.4em, 4vw, 2em);
   color: rgb(0, 0, 0);
   text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
   font-weight: bold;
-  background: rgba(255, 255, 255, 0.8);
-  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 8px 16px;
   border-radius: 15px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   border: 3px solid #4a5568;
   z-index: 1000;
 }
 
+.rc-result-container,
 #result-container {
   position: absolute;
-  min-width: 100%;
-  min-height: 100%;
-  top: 0;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   visibility: hidden;
   z-index: 1500;
+  background: rgba(0, 0, 0, 0.25);
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
 }
 
+.rc-result,
 #result {
   display: flex;
   flex-direction: column;
   align-items: center;
   background-color: white;
-  padding: 20px;
+  padding: 24px 28px;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  max-width: min(420px, 100%);
 }
 
+.rc-roast {
+  margin: 8px 0 16px;
+  padding: 12px 14px;
+  text-align: center;
+  font-size: clamp(0.95rem, 2.8vw, 1.15rem);
+  line-height: 1.35;
+  letter-spacing: 0.03em;
+  color: #7f1d1d;
+  background: #fef2f2;
+  border: 2px solid #fecaca;
+  border-radius: 12px;
+  max-width: 100%;
+}
+
+.rc-result button,
 #result button {
-  background-color: red;
-  padding: 20px 50px 20px 50px;
+  background-color: #e11d48;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 40px;
   font-family: inherit;
-  font-size: inherit;
+  font-size: 1rem;
+  font-weight: 700;
   cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .rc-controls-p1 {
+    right: max(12px, env(safe-area-inset-right));
+    left: auto;
+    bottom: max(12px, env(safe-area-inset-bottom));
+  }
+
+  .rc-controls-p2 {
+    left: max(12px, env(safe-area-inset-left));
+    right: auto;
+    bottom: max(12px, env(safe-area-inset-bottom));
+  }
+
+  .rc-controls-pad {
+    grid-template-columns: 56px 56px 56px;
+  }
+
+  .rc-pad-btn {
+    width: 56px;
+    height: 56px;
+  }
+
+  .rc-pad-forward {
+    width: 72px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .rc-controls-p1 {
+    bottom: max(8px, env(safe-area-inset-bottom));
+    right: max(8px, env(safe-area-inset-right));
+    left: auto;
+  }
+
+  .rc-controls-p2 {
+    bottom: max(8px, env(safe-area-inset-bottom));
+    left: max(8px, env(safe-area-inset-left));
+    right: auto;
+  }
+
+  .rc-pad-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 14px;
+  }
+
+  .rc-pad-forward {
+    width: 56px;
+  }
+}
+
+/* Legacy id hooks still used by result markup */
+#score {
+  /* styled via .rc-score */
+}
+
+/* —— Centered 3D oval loading screen —— */
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background:
+    radial-gradient(ellipse at center, rgba(102, 126, 234, 0.35) 0%, transparent 55%),
+    linear-gradient(145deg, #1a1a2e 0%, #16213e 45%, #0f3460 100%);
+  color: #fff;
+}
+
+.loading-screen-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 1.25rem;
+  padding: 1.5rem;
+}
+
+.loading-oval-stage {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  perspective: 600px;
+  transform-style: preserve-3d;
+}
+
+.loading-oval-canvas {
+  width: min(220px, 55vw);
+  height: min(220px, 55vw);
+  margin: 0 auto;
+}
+
+.loading-oval {
+  position: absolute;
+  inset: 18px;
+  border-radius: 50%;
+  border: 4px solid transparent;
+  border-top-color: #7c9cff;
+  border-right-color: rgba(124, 156, 255, 0.35);
+  box-shadow:
+    0 0 18px rgba(124, 156, 255, 0.45),
+    inset 0 0 12px rgba(124, 156, 255, 0.2);
+  transform-style: preserve-3d;
+}
+
+.loading-oval-a {
+  animation: loading-oval-spin 1.35s linear infinite;
+  transform: rotateX(68deg) rotateZ(0deg);
+}
+
+.loading-oval-b {
+  inset: 32px;
+  border-top-color: #ff6b9d;
+  border-right-color: rgba(255, 107, 157, 0.3);
+  box-shadow:
+    0 0 14px rgba(255, 107, 157, 0.4),
+    inset 0 0 10px rgba(255, 107, 157, 0.15);
+  animation: loading-oval-spin-reverse 1.8s linear infinite;
+  transform: rotateX(68deg) rotateY(25deg) rotateZ(0deg);
+}
+
+.loading-oval-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, #7c9cff 55%, #5a6fd6);
+  box-shadow: 0 0 20px rgba(124, 156, 255, 0.8);
+  animation: loading-oval-pulse 1.2s ease-in-out infinite;
+}
+
+.loading-screen-title {
+  margin: 0;
+  font-family: "Ferro Rosso", "Segoe UI", sans-serif;
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+}
+
+.loading-screen-hint {
+  margin: 0;
+  opacity: 0.65;
+  font-size: 0.95rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  animation: loading-hint-fade 1.4s ease-in-out infinite;
+}
+
+@keyframes loading-oval-spin {
+  to {
+    transform: rotateX(68deg) rotateZ(360deg);
+  }
+}
+
+@keyframes loading-oval-spin-reverse {
+  to {
+    transform: rotateX(68deg) rotateY(25deg) rotateZ(-360deg);
+  }
+}
+
+@keyframes loading-oval-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.72);
+    opacity: 0.7;
+  }
+}
+
+@keyframes loading-hint-fade {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-oval-a,
+  .loading-oval-b,
+  .loading-oval-core,
+  .loading-screen-hint {
+    animation: none;
+  }
 }
 

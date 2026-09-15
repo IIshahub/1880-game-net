@@ -8,24 +8,27 @@ import {
   useRef,
   type ReactNode,
 } from 'react';
+import type { PlayerSlot } from './constants';
 import type { Direction } from './types';
 
+type QueueMoveFn = (direction: Direction, player?: PlayerSlot) => void;
+
 interface GameContextValue {
-  queueMove: (direction: Direction) => void;
-  registerQueueMove: (fn: (direction: Direction) => void) => void;
+  queueMove: QueueMoveFn;
+  registerQueueMove: (fn: QueueMoveFn) => void;
 }
 
 const GameContext = createContext<GameContextValue | null>(null);
 
 export function GameControlsProvider({ children }: { children: ReactNode }) {
-  const queueMoveRef = useRef<(direction: Direction) => void>(() => {});
+  const queueMoveRef = useRef<QueueMoveFn>(() => {});
 
-  const registerQueueMove = useCallback((fn: (direction: Direction) => void) => {
+  const registerQueueMove = useCallback((fn: QueueMoveFn) => {
     queueMoveRef.current = fn;
   }, []);
 
-  const queueMove = useCallback((direction: Direction) => {
-    queueMoveRef.current(direction);
+  const queueMove = useCallback<QueueMoveFn>((direction, player = 0) => {
+    queueMoveRef.current(direction, player);
   }, []);
 
   const value = useMemo(

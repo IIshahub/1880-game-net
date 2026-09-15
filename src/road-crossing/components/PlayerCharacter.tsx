@@ -10,52 +10,82 @@ export interface PlayerCharacterHandle {
   container: Group | null;
 }
 
-export const PlayerCharacter = forwardRef<PlayerCharacterHandle>(function PlayerCharacter(
-  _props,
-  ref,
-) {
-  const containerRef = useRef<Group>(null);
-  const modelRef = useRef<Group>(null);
-  const character = getCurrentCharacter();
+const PARTNER_COLORS = {
+  body: 0x4fc3f7,
+  cap: 0xff7043,
+  eyes: 0x1a237e,
+};
 
-  useImperativeHandle(ref, () => ({
-    get model() {
-      return modelRef.current;
-    },
-    get container() {
-      return containerRef.current;
-    },
-  }));
+interface PlayerCharacterProps {
+  /** 0 = selected character, 1 = partner palette (chained mode) */
+  slot?: 0 | 1;
+}
 
-  return (
-    <group ref={containerRef}>
-      <group ref={modelRef}>
-        {character.style === 'textured' && character.texture ? (
-          <AliCharacterModel
-            texturePath={character.texture}
-            size={character.cubeSize}
-          />
-        ) : (
-          <>
-            <mesh position={[0, 0, 10]} castShadow receiveShadow>
-              <boxGeometry args={[15, 15, 20]} />
-              <meshStandardMaterial color={character.colors.body} flatShading />
-            </mesh>
-            <mesh position={[0, 0, 21]} castShadow receiveShadow>
-              <boxGeometry args={[2, 4, 2]} />
-              <meshStandardMaterial color={character.colors.cap} flatShading />
-            </mesh>
-            <mesh position={[-4, 8, 18]} castShadow>
-              <boxGeometry args={[2, 2, 2]} />
-              <meshStandardMaterial color={character.colors.eyes} flatShading />
-            </mesh>
-            <mesh position={[4, 8, 18]} castShadow>
-              <boxGeometry args={[2, 2, 2]} />
-              <meshStandardMaterial color={character.colors.eyes} flatShading />
-            </mesh>
-          </>
-        )}
+export const PlayerCharacter = forwardRef<PlayerCharacterHandle, PlayerCharacterProps>(
+  function PlayerCharacter({ slot = 0 }, ref) {
+    const containerRef = useRef<Group>(null);
+    const modelRef = useRef<Group>(null);
+    const character = getCurrentCharacter();
+    const isPartner = slot === 1;
+    const colors = isPartner
+      ? PARTNER_COLORS
+      : {
+          body: character.colors.body,
+          cap: character.colors.cap,
+          eyes: character.colors.eyes,
+        };
+
+    useImperativeHandle(ref, () => ({
+      get model() {
+        return modelRef.current;
+      },
+      get container() {
+        return containerRef.current;
+      },
+    }));
+
+    const useTexture = !isPartner && character.style === 'textured' && character.texture;
+
+    return (
+      <group ref={containerRef}>
+        <group ref={modelRef}>
+          {useTexture ? (
+            <AliCharacterModel
+              texturePath={character.texture}
+              size={character.cubeSize}
+            />
+          ) : (
+            <>
+              <mesh position={[0, 0, 10]} castShadow receiveShadow>
+                <boxGeometry args={[15, 15, 20]} />
+                <meshStandardMaterial
+                  color={colors.body}
+                  flatShading
+                  roughness={0.55}
+                  metalness={0.08}
+                />
+              </mesh>
+              <mesh position={[0, 0, 21]} castShadow receiveShadow>
+                <boxGeometry args={[2, 4, 2]} />
+                <meshStandardMaterial
+                  color={colors.cap}
+                  flatShading
+                  roughness={0.45}
+                  metalness={0.1}
+                />
+              </mesh>
+              <mesh position={[-4, 8, 18]} castShadow>
+                <boxGeometry args={[2, 2, 2]} />
+                <meshStandardMaterial color={colors.eyes} flatShading />
+              </mesh>
+              <mesh position={[4, 8, 18]} castShadow>
+                <boxGeometry args={[2, 2, 2]} />
+                <meshStandardMaterial color={colors.eyes} flatShading />
+              </mesh>
+            </>
+          )}
+        </group>
       </group>
-    </group>
-  );
-});
+    );
+  },
+);

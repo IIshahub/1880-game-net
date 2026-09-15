@@ -1,22 +1,22 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState, Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { getGame } from '@/gameManager';
+import LoadingScreen from '@/components/LoadingScreen';
 
-// Dynamic imports to prevent SSR issues
-const RoadCrossingGame = dynamic(() => import('@/components/RoadCrossingGame'), { 
+const RoadCrossingGame = dynamic(() => import('@/components/RoadCrossingGame'), {
   ssr: false,
-  loading: () => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontSize: '24px' }}>Loading Road Crossing...</div>
+  loading: () => <LoadingScreen title="Loading Road Crossing" />,
 });
-const ChessGame = dynamic(() => import('@/components/ChessGame'), { 
+const ChessGame = dynamic(() => import('@/components/ChessGame'), {
   ssr: false,
-  loading: () => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontSize: '24px' }}>Loading Chess...</div>
+  loading: () => <LoadingScreen title="Loading Chess" />,
 });
-const XOGame = dynamic(() => import('@/components/XOGame'), { 
+const XOGame = dynamic(() => import('@/components/XOGame'), {
   ssr: false,
-  loading: () => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontSize: '24px' }}>Loading Tic Tac Toe...</div>
+  loading: () => <LoadingScreen title="Loading Tic Tac Toe" />,
 });
 
 export default function GamePage() {
@@ -32,12 +32,12 @@ export default function GamePage() {
   }, [game, router]);
 
   if (!game) {
-    return null;
+    return <LoadingScreen title="Loading" />;
   }
 
   if (gameId === 'roadCrossing') {
     return (
-      <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontSize: '24px' }}>Loading Road Crossing...</div>}>
+      <Suspense fallback={<LoadingScreen title="Loading Road Crossing" />}>
         <RoadCrossingGame />
       </Suspense>
     );
@@ -45,7 +45,7 @@ export default function GamePage() {
 
   if (gameId === 'chess') {
     return (
-      <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontSize: '24px' }}>Loading Chess...</div>}>
+      <Suspense fallback={<LoadingScreen title="Loading Chess" />}>
         <ChessGame />
       </Suspense>
     );
@@ -53,7 +53,7 @@ export default function GamePage() {
 
   if (gameId === 'xo') {
     return (
-      <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontSize: '24px' }}>Loading Tic Tac Toe...</div>}>
+      <Suspense fallback={<LoadingScreen title="Loading Tic Tac Toe" />}>
         <XOGame />
       </Suspense>
     );
@@ -62,8 +62,9 @@ export default function GamePage() {
   return (
     <div className="game-screen">
       <h1>Game not found</h1>
-      <button onClick={() => router.push('/')}>Back to Menu</button>
+      <button type="button" onClick={() => router.push('/')}>
+        Back to Menu
+      </button>
     </div>
   );
 }
-
