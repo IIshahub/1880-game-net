@@ -44,6 +44,8 @@ function RoadCrossingGameContent() {
   const [showThemeModal, setShowThemeModal] = useState(false);
   const [showCharacterModal, setShowCharacterModal] = useState(false);
   const [score, setScore] = useState(0);
+  const [coinRun, setCoinRun] = useState({ coinsCollected: 0, coinPoints: 0 });
+  const [scoreSaved, setScoreSaved] = useState<string | null>(null);
   const [gameOver, setGameOver] = useState(false);
   const [sceneKey, setSceneKey] = useState(0);
   const [themeKey, setThemeKey] = useState(getCurrentThemeName());
@@ -63,10 +65,40 @@ function RoadCrossingGameContent() {
 
   const resetGame = useCallback(() => {
     setScore(0);
+    setCoinRun({ coinsCollected: 0, coinPoints: 0 });
+    setScoreSaved(null);
     setGameOver(false);
     setRoast('');
     setSceneKey((k) => k + 1);
   }, []);
+
+  const submitRunScore = useCallback(
+    async (finalScore: number, coins: { coinsCollected: number; coinPoints: number }) => {
+      try {
+        const res = await fetch('/api/scores/road-crossing', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            score: finalScore,
+            coinsCollected: coins.coinsCollected,
+            coinPoints: coins.coinPoints,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setScoreSaved(data.error ?? 'Could not save score');
+          return;
+        }
+        const parts: string[] = [];
+        if (data.newBestScore) parts.push('New best score!');
+        if (coins.coinPoints > 0) parts.push(`+${coins.coinPoints} coin points saved`);
+        setScoreSaved(parts.length ? parts.join(' ') : 'Run saved to leaderboard');
+      } catch {
+        setScoreSaved('Could not reach server');
+      }
+    },
+    [],
+  );
 
   const setMode = (kind: SessionKind) => {
     if (kind === 'online-chain') {
@@ -77,6 +109,8 @@ function RoadCrossingGameContent() {
     setSessionKind(kind);
     kind === 'solo' ? createSoloSession() : createLocalChainSession();
     setScore(0);
+    setCoinRun({ coinsCollected: 0, coinPoints: 0 });
+    setScoreSaved(null);
     setGameOver(false);
     setSceneKey((k) => k + 1);
   };
@@ -190,10 +224,13 @@ function RoadCrossingGameContent() {
           chainedMode={chainedMode}
           cameraZoom={cameraZoom}
           onScoreChange={setScore}
-          onGameOver={(finalScore) => {
+          onCoinRunChange={setCoinRun}
+          onGameOver={(finalScore, coins) => {
             setScore(finalScore);
+            setCoinRun(coins);
             setRoast(pickHumiliatingLine());
             setGameOver(true);
+            void submitRunScore(finalScore, coins);
           }}
           gameOver={gameOver}
         />
@@ -215,6 +252,11 @@ function RoadCrossingGameContent() {
         {score}
         {chainedMode ? <span className="rc-score-mode"> chained</span> : null}
       </div>
+      <div className="rc-coins-hud" aria-live="polite">
+        <span className="rc-coins-icon">🪙</span>
+        <span>{coinRun.coinsCollected}</span>
+        <span className="rc-coins-points">+{coinRun.coinPoints} pts</span>
+      </div>
 
       {chainedMode && (
         <div className="rc-chain-hint">
@@ -233,6 +275,10 @@ function RoadCrossingGameContent() {
           <p>
             Score: <span id="final-score">{score}</span>
           </p>
+          <p className="rc-run-coins">
+            Coins: {coinRun.coinsCollected} · Coin points: {coinRun.coinPoints}
+          </p>
+          {scoreSaved ? <p className="rc-score-saved">{scoreSaved}</p> : null}
           <button type="button" id="retry" onClick={resetGame}>
             Retry
           </button>

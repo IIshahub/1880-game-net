@@ -4,20 +4,15 @@ import { forwardRef, useImperativeHandle, useRef } from 'react';
 import type { Group } from 'three';
 import { getCurrentCharacter } from '../../characterManager';
 import { AliCharacterModel } from './AliCharacterModel';
+import { PartnerVoxelModel, VoxelAnimalModel } from './VoxelAnimalModel';
 
 export interface PlayerCharacterHandle {
   model: Group | null;
   container: Group | null;
 }
 
-const PARTNER_COLORS = {
-  body: 0x4fc3f7,
-  cap: 0xff7043,
-  eyes: 0x1a237e,
-};
-
 interface PlayerCharacterProps {
-  /** 0 = selected character, 1 = partner palette (chained mode) */
+  /** 0 = selected character, 1 = partner (chained mode) */
   slot?: 0 | 1;
 }
 
@@ -27,13 +22,6 @@ export const PlayerCharacter = forwardRef<PlayerCharacterHandle, PlayerCharacter
     const modelRef = useRef<Group>(null);
     const character = getCurrentCharacter();
     const isPartner = slot === 1;
-    const colors = isPartner
-      ? PARTNER_COLORS
-      : {
-          body: character.colors.body,
-          cap: character.colors.cap,
-          eyes: character.colors.eyes,
-        };
 
     useImperativeHandle(ref, () => ({
       get model() {
@@ -45,21 +33,29 @@ export const PlayerCharacter = forwardRef<PlayerCharacterHandle, PlayerCharacter
     }));
 
     const useTexture = !isPartner && character.style === 'textured' && character.texture;
+    const useVoxel = !isPartner && character.style === 'voxel';
 
     return (
       <group ref={containerRef}>
         <group ref={modelRef}>
-          {useTexture ? (
+          {isPartner ? (
+            <PartnerVoxelModel />
+          ) : useTexture ? (
             <AliCharacterModel
               texturePath={character.texture}
               size={character.cubeSize}
+            />
+          ) : useVoxel ? (
+            <VoxelAnimalModel
+              species={character.species || character.id}
+              colors={character.colors}
             />
           ) : (
             <>
               <mesh position={[0, 0, 10]} castShadow receiveShadow>
                 <boxGeometry args={[15, 15, 20]} />
                 <meshStandardMaterial
-                  color={colors.body}
+                  color={character.colors.body}
                   flatShading
                   roughness={0.55}
                   metalness={0.08}
@@ -68,7 +64,7 @@ export const PlayerCharacter = forwardRef<PlayerCharacterHandle, PlayerCharacter
               <mesh position={[0, 0, 21]} castShadow receiveShadow>
                 <boxGeometry args={[2, 4, 2]} />
                 <meshStandardMaterial
-                  color={colors.cap}
+                  color={character.colors.cap ?? character.colors.accent ?? 0xf0619a}
                   flatShading
                   roughness={0.45}
                   metalness={0.1}
@@ -76,11 +72,11 @@ export const PlayerCharacter = forwardRef<PlayerCharacterHandle, PlayerCharacter
               </mesh>
               <mesh position={[-4, 8, 18]} castShadow>
                 <boxGeometry args={[2, 2, 2]} />
-                <meshStandardMaterial color={colors.eyes} flatShading />
+                <meshStandardMaterial color={character.colors.eyes ?? 0x111111} flatShading />
               </mesh>
               <mesh position={[4, 8, 18]} castShadow>
                 <boxGeometry args={[2, 2, 2]} />
-                <meshStandardMaterial color={colors.eyes} flatShading />
+                <meshStandardMaterial color={character.colors.eyes ?? 0x111111} flatShading />
               </mesh>
             </>
           )}

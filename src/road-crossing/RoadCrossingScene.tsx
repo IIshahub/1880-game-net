@@ -18,6 +18,8 @@ import {
   tileSize,
   type PlayerSlot,
 } from './constants';
+import { tryCollectCoinAt, type CoinRunStats } from './coins/collectCoins';
+import { generateStarterRowCoins } from './coins/starterCoins';
 import { generateRows } from './generateRows';
 import { useRoadCrossingControls } from './GameContext';
 import { endsUpInValidPosition, positionAfterMoves } from './validation';
@@ -47,7 +49,8 @@ interface PlayerRuntime {
 interface RoadCrossingSceneProps {
   characterKey: string;
   onScoreChange: (score: number) => void;
-  onGameOver: (score: number) => void;
+  onCoinRunChange: (stats: CoinRunStats) => void;
+  onGameOver: (score: number, coinRun: CoinRunStats) => void;
   gameOver: boolean;
   chainedMode?: boolean;
   /** Orthographic zoom factor (1 = default). Higher = closer. */
@@ -70,6 +73,7 @@ function createPlayer(
 export function RoadCrossingScene({
   characterKey,
   onScoreChange,
+  onCoinRunChange,
   onGameOver,
   gameOver,
   chainedMode = false,
@@ -80,8 +84,13 @@ export function RoadCrossingScene({
   const p1Handle = useRef<PlayerCharacterHandle>(null);
   const p2Handle = useRef<PlayerCharacterHandle>(null);
   const [rows, setRows] = useState<RowMetadata[]>(() => generateRows(ROWS_PER_BATCH));
+  const [starterCoins] = useState(() => generateStarterRowCoins());
+  const starterCoinsRef = useRef(starterCoins);
+  starterCoinsRef.current = starterCoins;
+  const [coinRevision, setCoinRevision] = useState(0);
   const rowsRef = useRef(rows);
   rowsRef.current = rows;
+  const coinRunRef = useRef<CoinRunStats>({ coinsCollected: 0, coinPoints: 0 });
 
   const playersRef = useRef<PlayerRuntime[]>([
     createPlayer(p1Handle, 0),
@@ -109,7 +118,9 @@ export function RoadCrossingScene({
     ];
     placedRef.current = false;
     bestScoreRef.current = 0;
-  }, [chainedMode, characterKey]);
+    coinRunRef.current = { coinsCollected: 0, coinPoints: 0 };
+    onCoinRunChange(coinRunRef.current);
+  }, [chainedMode, characterKey, onCoinRunChange]);
 
   const addRows = useCallback(() => {
     setRows((prev) => [...prev, ...generateRows(ROWS_PER_BATCH, prev.length)]);
@@ -149,9 +160,26 @@ export function RoadCrossingScene({
         setDustBurst((n) => n + 1);
       }
       playCameraPunch(shakeRef.current, 5);
+
+      const pickup = tryCollectCoinAt(
+        player.position.currentRow,
+        player.position.currentTile,
+        starterCoinsRef.current,
+        rowsRef.current,
+      );
+      if (pickup) {
+        coinRunRef.current = {
+          coinsCollected: coinRunRef.current.coinsCollected + pickup.coinsCollected,
+          coinPoints: coinRunRef.current.coinPoints + pickup.coinPoints,
+        };
+        onCoinRunChange(coinRunRef.current);
+        setCoinRevision((n) => n + 1);
+        playCameraPunch(shakeRef.current, 8);
+      }
+
       syncScore();
     },
-    [syncScore],
+    [onCoinRunChange, syncScore],
   );
 
   const queueMove = useCallback((direction: Direction, playerSlot: PlayerSlot = 0) => {
@@ -306,7 +334,7 @@ export function RoadCrossingScene({
           p.moves = [];
         });
         playHitShake(shakeRef.current);
-        onGameOver(bestScoreRef.current);
+        onGameOver(bestScoreRef.current, coinRunRef.current);
         return;
       }
 
@@ -339,7 +367,7 @@ export function RoadCrossingScene({
           p.moves = [];
         });
         playHitShake(shakeRef.current);
-        onGameOver(bestScoreRef.current);
+        onGameOver(bestScoreRef.current, coinRunRef.current);
         return;
       }
     }
@@ -370,7 +398,7 @@ export function RoadCrossingScene({
   return (
     <>
       <GameLighting />
-      <GameMap rows={rows} />
+      <GameMap rows={rows} starterCoins={starterCoins} coinRevision={coinRevision} />
       <PlayerCharacter key={`p1-${characterKey}`} ref={p1Handle} slot={0} />
       {chainedMode && (
         <>

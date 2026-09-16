@@ -1,9 +1,18 @@
 import { tilesPerRow, tileSize } from '../constants';
 import { getCurrentTheme } from '../../themeManager';
 import { TreeMesh } from './TreeMesh';
-import type { ForestRow } from '../types';
+import { CoinMesh } from './CoinMesh';
+import type { CoinMeta, ForestRow } from '../types';
 
-export function GrassRow({ rowIndex, data }: { rowIndex: number; data?: ForestRow }) {
+export function GrassRow({
+  rowIndex,
+  data,
+  extraCoins,
+}: {
+  rowIndex: number;
+  data?: ForestRow;
+  extraCoins?: CoinMeta[];
+}) {
   const theme = getCurrentTheme();
 
   return (
@@ -32,6 +41,11 @@ export function GrassRow({ rowIndex, data }: { rowIndex: number; data?: ForestRo
       {data?.trees.map((tree, i) => (
         <TreeMesh key={i} tileIndex={tree.tileIndex} height={tree.height} />
       ))}
+      {(extraCoins ?? data?.coins ?? [])
+        .filter((c) => !c.collected)
+        .map((coin) => (
+          <CoinMesh key={`coin-${rowIndex}-${coin.tileIndex}`} tileIndex={coin.tileIndex} />
+        ))}
     </group>
   );
 }

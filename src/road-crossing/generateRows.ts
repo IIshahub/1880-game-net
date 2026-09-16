@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { minTileIndex, maxTileIndex } from './constants';
 import { getCurrentTheme } from '../themeManager';
-import type { RowMetadata } from './types';
+import type { CoinMeta, RowMetadata } from './types';
 
 function randomElement<T>(array: T[]): T {
   return array[Math.floor(Math.random() * array.length)];
@@ -22,7 +22,21 @@ function generateForestRow(): RowMetadata {
     occupiedTiles.add(tileIndex);
     return { tileIndex, height: randomElement([20, 45, 60]) };
   });
-  return { type: 'forest', trees };
+  const coins: CoinMeta[] = [];
+  const coinCount = THREE.MathUtils.randInt(1, 3);
+  for (let c = 0; c < coinCount; c++) {
+    let tileIndex: number;
+    let attempts = 0;
+    do {
+      tileIndex = THREE.MathUtils.randInt(minTileIndex, maxTileIndex);
+      attempts += 1;
+    } while (occupiedTiles.has(tileIndex) && attempts < 24);
+    if (occupiedTiles.has(tileIndex)) continue;
+    occupiedTiles.add(tileIndex);
+    coins.push({ tileIndex, collected: false });
+  }
+
+  return { type: 'forest', trees, coins };
 }
 
 function generateCarRow(rowCount: number): RowMetadata {

@@ -1,15 +1,28 @@
 import { INITIAL_GRASS_ROWS } from '../constants';
 import { GrassRow } from './GrassRow';
 import { RoadRow } from './RoadRow';
-import type { RowMetadata } from '../types';
+import type { CoinMeta, RowMetadata } from '../types';
 
-export function GameMap({ rows }: { rows: RowMetadata[] }) {
+export function GameMap({
+  rows,
+  starterCoins,
+  coinRevision,
+}: {
+  rows: RowMetadata[];
+  starterCoins: Record<number, CoinMeta[]>;
+  coinRevision: number;
+}) {
+  void coinRevision;
   const grassRows = Array.from({ length: INITIAL_GRASS_ROWS }, (_, i) => -i);
 
   return (
     <group>
       {grassRows.map((rowIndex) => (
-        <GrassRow key={`grass-${rowIndex}`} rowIndex={rowIndex} />
+        <GrassRow
+          key={`grass-${rowIndex}`}
+          rowIndex={rowIndex}
+          extraCoins={starterCoins[rowIndex]}
+        />
       ))}
       {rows.map((rowData, index) => {
         const rowIndex = index + 1;

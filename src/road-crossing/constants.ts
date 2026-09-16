@@ -22,3 +22,5 @@ export const CHAIN_MAX_TILE_DISTANCE = 4;
 export const CHAIN_HEIGHT_Z = 18;
 export const MAX_CHAIN_PLAYERS = 2;
 export type PlayerSlot = 0 | 1;
+
+export const COIN_POINTS_VALUE = 10;

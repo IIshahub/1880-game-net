@@ -7,6 +7,11 @@ export interface TreeMeta {
   height: number;
 }
 
+export interface CoinMeta {
+  tileIndex: number;
+  collected: boolean;
+}
+
 export interface VehicleMeta {
   initialTileIndex: number;
   color: number;
@@ -17,6 +22,7 @@ export interface VehicleMeta {
 export interface ForestRow {
   type: 'forest';
   trees: TreeMeta[];
+  coins: CoinMeta[];
 }
 
 export interface CarRow {

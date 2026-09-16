@@ -23,10 +23,23 @@ html, body {
   overflow: hidden;
 }
 
-body {
+body.app-body {
   display: flex;
+  flex-direction: column;
+  min-height: 100%;
   font-family: "Ferro Rosso", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   letter-spacing: 0.04em;
+}
+
+body.app-body > * {
+  flex: 1 0 auto;
+  width: 100%;
+}
+
+body.app-body:has(.auth-screen),
+body.app-body:has(.leaderboard-screen),
+body.app-body:has(.game-menu) {
+  overflow: auto;
 }
 
 /* منوی بازی */
@@ -65,6 +78,161 @@ body {
 .game-menu-header {
   text-align: center;
   margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.auth-user-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+}
+
+.auth-user-bar button {
+  border: 0;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font: inherit;
+}
+
+.auth-user-bar button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.auth-screen {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(255, 120, 80, 0.35), transparent 45%),
+    radial-gradient(ellipse at 80% 90%, rgba(60, 100, 220, 0.35), transparent 50%),
+    linear-gradient(160deg, #1a1520 0%, #2a1f18 45%, #121820 100%);
+}
+
+.auth-card {
+  width: min(100%, 420px);
+  padding: 32px 28px 24px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(14px);
+  color: #f5f2ec;
+}
+
+.auth-title {
+  margin: 0;
+  font-family: "Ferro Rosso", "Segoe UI", sans-serif;
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.auth-subtitle {
+  margin: 8px 0 22px;
+  text-align: center;
+  opacity: 0.75;
+  font-size: 0.95rem;
+}
+
+.auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.auth-tabs button {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.2);
+  color: #f5f2ec;
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.auth-tabs button.active {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.auth-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.auth-form input {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(0, 0, 0, 0.28);
+  color: #fff;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font: inherit;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.auth-form input:focus {
+  outline: 2px solid rgba(255, 180, 120, 0.55);
+  outline-offset: 1px;
+}
+
+.auth-error {
+  margin: 0;
+  color: #ffb4b4;
+  font-size: 0.9rem;
+}
+
+.auth-submit {
+  margin-top: 4px;
+  border: 0;
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font: inherit;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #1a120c;
+  background: linear-gradient(135deg, #ffb074, #ff7a4d);
+}
+
+.auth-submit:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.auth-hint {
+  margin: 16px 0 0;
+  font-size: 0.8rem;
+  opacity: 0.6;
+  text-align: center;
+  line-height: 1.4;
 }
 
 .game-menu-title {
@@ -713,6 +881,42 @@ canvas.game {
   width: 64px;
 }
 
+.rc-coins-hud {
+  position: absolute;
+  top: max(64px, calc(env(safe-area-inset-top) + 52px));
+  right: max(12px, env(safe-area-inset-right));
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: clamp(1rem, 3.2vw, 1.35rem);
+  font-weight: 700;
+  color: #3d2e00;
+  background: linear-gradient(135deg, #fff8dc, #ffe082);
+  padding: 8px 14px;
+  border-radius: 15px;
+  border: 3px solid #c9a227;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.rc-coins-points {
+  font-size: 0.85em;
+  opacity: 0.85;
+}
+
+.rc-run-coins {
+  margin: 0.35rem 0 0;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+.rc-score-saved {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  color: #2d6a4f;
+  font-weight: 600;
+}
+
 .rc-score {
   position: absolute;
   top: max(64px, calc(env(safe-area-inset-top) + 52px));
@@ -972,6 +1176,157 @@ canvas.game {
   50% {
     opacity: 0.85;
   }
+}
+
+.leaderboard-screen {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(ellipse at 15% 20%, rgba(102, 126, 234, 0.45), transparent 50%),
+    radial-gradient(ellipse at 85% 80%, rgba(255, 180, 80, 0.35), transparent 45%),
+    linear-gradient(165deg, #1a1528, #2a2035 50%, #121820);
+}
+
+.leaderboard-card {
+  width: min(100%, 560px);
+  padding: 24px 22px 28px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #f8f6f2;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px);
+}
+
+.leaderboard-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.leaderboard-top h1 {
+  margin: 0;
+  flex: 1;
+  text-align: center;
+  font-family: "Ferro Rosso", "Segoe UI", sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: clamp(1.4rem, 4vw, 1.9rem);
+}
+
+.leaderboard-back {
+  border: 0;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font: inherit;
+}
+
+.leaderboard-you {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  justify-content: center;
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.25);
+  font-size: 0.9rem;
+}
+
+.leaderboard-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.leaderboard-tabs button {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.2);
+  color: #fff;
+  padding: 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.leaderboard-tabs button.active {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.leaderboard-hint {
+  margin: 0 0 14px;
+  font-size: 0.82rem;
+  opacity: 0.75;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.leaderboard-empty {
+  text-align: center;
+  opacity: 0.8;
+  margin: 24px 0;
+}
+
+.leaderboard-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.leaderboard-list li {
+  display: grid;
+  grid-template-columns: 52px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.leaderboard-list li.rank-1 {
+  border-color: rgba(255, 215, 0, 0.55);
+  background: rgba(255, 215, 0, 0.12);
+}
+
+.leaderboard-list li.rank-2 {
+  border-color: rgba(192, 192, 192, 0.45);
+}
+
+.leaderboard-list li.rank-3 {
+  border-color: rgba(205, 127, 50, 0.45);
+}
+
+.lb-rank {
+  font-weight: 700;
+  opacity: 0.85;
+}
+
+.lb-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lb-value {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.lb-sub {
+  font-weight: 500;
+  font-size: 0.82em;
+  opacity: 0.75;
 }
 
 @media (prefers-reduced-motion: reduce) {
